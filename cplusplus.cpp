@@ -9,6 +9,7 @@
 #include <cppconn/exception.h>
 #include <cppconn/resultset.h>
 #include <cppconn/statement.h>
+#include <cppconn/resultset_metadata.h>
 
 #include <cgicc/CgiDefs.h>
 #include <cgicc/Cgicc.h>
@@ -25,7 +26,8 @@ char line[MAX_LEN];
 char s1[MAX_LEN];
 
 std::string executeReport(std::string report, std::string var) {
-	if((pConfLoc = fopen("reports/medtronic.conf", "r")) == NULL) {
+	string fp = "reports/"+report+".conf";
+	if((pConfLoc = fopen(fp.c_str(), "r")) == NULL) {
 		cout << "Kan rapportage template niet openen." << endl;	
 	}
 	else {
@@ -51,6 +53,7 @@ int main() {
 	cout << "<head>\n";
 	cout << "<meta charset=\"UTF-8\">\n";
 	cout << "<title></title>\n";
+	cout << "<script src=\"../js/functions.js\"></script>"; 
 	cout << "</head>\n";
 	cout << "<body>\n";
 
@@ -62,27 +65,49 @@ int main() {
 	sql::ResultSetMetaData *rsmd;
 
 	driver = get_driver_instance();
-	con = driver->connect("tcp://IPADDRESS", "USER", "PASS");
+	con = driver->connect("tcp://192.168.162.56:3306", "rik", "Parkway91");
 	
-	con->setSchema("DB");
+	con->setSchema("multipressdata");
 	stmt = con->createStatement();
-	form_iterator fi = formData.getElement("klantnr");
+	//form_iterator fi = formData.getElement("klantnr");
 
-	std::string table = executeReport("medtronic","table");
-	std::string fields = executeReport("medtronic","fields");
-	std::cout << table;
-	std::cout << fields;
+	std::string table = executeReport("statussen","table");
+	std::string fields = executeReport("statussen","fields");
+	std::string params = executeReport("statussen","params");
 	
-	if ( !fi->isEmpty() && fi != (*formData).end()) {
-		res = stmt->executeQuery("SELECT "+fields+" FROM "+table);
-		//rsmd = res->getMetaData();
-		//colcnt = rsmd->getColumnName();
+	std::cout << "<input placeholder=\"Zoek op klant...\" onkeyup=\"search(this,0)\" />";
+	std::cout << "<input placeholder=\"Zoek op ordernummer...\" onkeyup=\"search(this,1)\" />";
+
+	//if ( !fi->isEmpty() && fi != (*formData).end()) {
+	string query;
+	if(params != "") {
+		query = "SELECT "+fields+" FROM "+table+" WHERE "+params;
 	}
+	else {
+		query = "SELECT "+fields+" FROM "+table;
+	}
+	res = stmt->executeQuery(query.c_str());
+       	rsmd = res->getMetaData();
+	int colcnt = rsmd->getColumnCount();
+	//}
+	std::cout << "<table id=\"resultTable\">";
+	std::cout << "<tr>";
 	
+ 	for(int j = 1; j <= colcnt; j++) 
+	{
+		string colName = rsmd->getColumnName(j);
+		//colName = "col";
+		std::cout << "<th>" << colName << "</th>";
+	}		
+	std::cout << "</tr>";
 	while (res->next()) {
-		
-		cout << res->getString(1) << "<br>";	
+		std::cout << "<tr>";
+		for(int i = 1; i <= colcnt; i++) {
+			cout << "<td>" << res->getString(i) << "</td>";
+		}
+		std::cout << "</tr>";
 	}
+	std::cout << "</table>";
 	delete res;
 	delete stmt;
 	delete con;

@@ -1,0 +1,23 @@
+<html>
+<head></head> 
+<body>
+		<form name="reportCreateForm" method="post" action="cgi-bin/reportcreator.cgi">
+		Tabelnaam: 
+		<select name="tables">
+				<option value="CALC_FORMULIER">Orders en calculaties</options>
+				<option value="CALC_GEGEVENS">Sub-orders en calculaties</options>
+				<option value="KLANT_VOORRAAD">Klantenvoorraad</options>
+				<option value="KLANT_DRUKWERK">Klantendrukwerk</options>
+		</select><br>
+		Koppelen met:
+		<select name="joins">
+				<option value="CALC_FORMULIER">Orders en calculaties</options>
+				<option value="CALC_GEGEVENS">Sub-orders en calculaties</options>
+				<option value="KLANT_VOORRAAD">Klantenvoorraad</options>
+				<option value="KLANT_DRUKWERK">Klantendrukwerk</options>
+		</select><br>
+		Velden: <input type="text" name="fieldNameFld" /><br>
+		Mailen naar: <input type="text" name="toFld" /><br>
+		<input type="submit" value="Maak rapport aan" />
+</body>
+</html>
