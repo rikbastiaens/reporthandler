@@ -62,9 +62,9 @@ int main() {
 	sql::ResultSetMetaData *rsmd;
 
 	driver = get_driver_instance();
-	con = driver->connect("tcp://192.168.162.56:3306", "rik", "Parkway91");
+	con = driver->connect("tcp://IPADDRESS", "USER", "PASS");
 	
-	con->setSchema("multipressdata");
+	con->setSchema("DB");
 	stmt = con->createStatement();
 	form_iterator fi = formData.getElement("klantnr");
 
@@ -74,7 +74,6 @@ int main() {
 	std::cout << fields;
 	
 	if ( !fi->isEmpty() && fi != (*formData).end()) {
-		//res = stmt->executeQuery("SELECT "+fields+" FROM "+table+" WHERE KLANTNR = \'"+**fi+"\'");
 		res = stmt->executeQuery("SELECT "+fields+" FROM "+table);
 		//rsmd = res->getMetaData();
 		//colcnt = rsmd->getColumnName();
